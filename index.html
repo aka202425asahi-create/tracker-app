@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>売上トラッカー</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+
+<style>
+body { font-family: sans-serif; text-align:center; padding:20px; }
+button { font-size:20px; padding:10px 20px; margin:10px; }
+</style>
+</head>
+
+<body>
+
+<h1>💰 売上トラッカー</h1>
+
+<select id="item"></select><br>
+
+<button onclick="count--">−</button>
+<span id="num">0</span>
+<button onclick="count++">＋</button>
+
+<h2 id="result">¥0</h2>
+
+<script>
+let items = [{name:"りんご",price:100}];
+let count = 0;
+
+const select = document.getElementById("item");
+const num = document.getElementById("num");
+const result = document.getElementById("result");
+
+function update(){
+  num.textContent = count;
+  const item = items[select.value];
+  result.textContent = "¥" + (item.price * count);
+}
+
+select.innerHTML = `<option value="0">りんご</option>`;
+
+setInterval(update,100);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
