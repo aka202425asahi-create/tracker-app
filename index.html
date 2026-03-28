@@ -3,47 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>売上トラッカー</title>
+<title>売上・利益トラッカー</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 
 <style>
-body { font-family: sans-serif; text-align:center; padding:20px; }
-button { font-size:20px; padding:10px 20px; margin:10px; }
+body { font-family: sans-serif; padding:20px; background:#f8fafc; }
+.card { background:white; padding:15px; border-radius:10px; margin-bottom:10px; }
+input, select { width:100%; padding:10px; margin:5px 0; }
+button { padding:10px; width:100%; }
 </style>
 </head>
 
 <body>
 
-<h1>💰 売上トラッカー</h1>
+<h2>💰 売上・利益トラッカー</h2>
 
-<select id="item"></select><br>
+<div class="card">
+<input id="name" placeholder="商品名">
+<input id="cost" type="number" placeholder="原価">
+<input id="sale" type="number" placeholder="売価">
+<button onclick="add()">商品追加</button>
+</div>
 
+<div class="card">
+<select id="select" onchange="reset()"></select>
 <button onclick="count--">−</button>
 <span id="num">0</span>
 <button onclick="count++">＋</button>
+</div>
 
-<h2 id="result">¥0</h2>
+<div class="card">
+売上：<span id="sales">0</span><br>
+利益：<span id="profit">0</span>
+</div>
 
 <script>
-let items = [{name:"りんご",price:100}];
+let items = JSON.parse(localStorage.getItem("items")) || [];
 let count = 0;
 
-const select = document.getElementById("item");
-const num = document.getElementById("num");
-const result = document.getElementById("result");
-
-function update(){
-  num.textContent = count;
-  const item = items[select.value];
-  result.textContent = "¥" + (item.price * count);
+function save(){
+  localStorage.setItem("items", JSON.stringify(items));
 }
 
-select.innerHTML = `<option value="0">りんご</option>`;
+function add(){
+  const n = name.value;
+  const c = +cost.value;
+  const s = +sale.value;
+  if(!n || !c || !s) return alert("入力して");
+  items.push({n,c,s});
+  save();
+  updateSelect();
+}
 
-setInterval(update,100);
+function updateSelect(){
+  select.innerHTML = "";
+  items.forEach((i,idx)=>{
+    select.innerHTML += `<option value="${idx}">${i.n}</option>`;
+  });
+}
+updateSelect();
 
+function reset(){
+  count=0;
+}
+
+setInterval(()=>{
+  num.textContent = count;
+  const i = items[select.value];
+  if(!i) return;
+  sales.textContent = i.s * count;
+  profit.textContent = (i.s - i.c) * count;
+},100);
+
+// PWA
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
